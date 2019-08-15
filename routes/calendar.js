@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
   res.json({
     status: 200,
     version: package.version,
-    msg: 'Welcome on the api of GarageISEP'
+    msg: 'Here you can find all of our events'
   })
 })
 
