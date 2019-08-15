@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
   })
 })
 
-router.get('/list', asyncMiddleware(async (req, res, next) => {
+router.get('/calendarList/list', asyncMiddleware(async (req, res, next) => {
   res.status(200);
   res.json(await calendar.listPublicCalendars())
 }))
