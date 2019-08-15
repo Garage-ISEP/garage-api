@@ -1,3 +1,6 @@
+# Api keys
+utils/googleapis/privatekey.json
+
 # Logs
 logs
 *.log
