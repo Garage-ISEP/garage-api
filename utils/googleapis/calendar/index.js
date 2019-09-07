@@ -4,7 +4,7 @@ const publicCalendars = require('./calendars.json')
 /**
  * List all events of a calendar
  * @param {String} id email used to diferentiate calendars
- * @param {*} from date in ISO format
+ * @param {Object} config see google api
  */
 async function getEvents (id, config) {
     const response = await calendar.events.list({
@@ -15,15 +15,18 @@ async function getEvents (id, config) {
     return response.data
 }
 
+// TODO: gérer les exceptions
+
 /**
- * List all events of a calendar from the closest to the newest
- * @param {String} calendarsIds list of all the emails used to diferentiate calendars
- * @param {String} from date in ISO format
+ * List all events of a calendar
+ * @param {*} calendarsIds list of all the emails used to diferentiate calendars
+ * @param {*} orderBy order by default asc
+ * @param {*} config see googleapi
  */
-async function getOrderedEvents(calendarsIds, from) {
+async function getAllEvents(calendarsIds, config={}, orderBy='asc') {
     let result = []
     await Promise.all(calendarsIds.map(async id => {
-        const response = await getEvents(id, from)
+        const response = await getEvents(id, config)
         const items = response.items.map(event => {
             return Object.assign({calendarId: id}, event)
         })
@@ -32,11 +35,18 @@ async function getOrderedEvents(calendarsIds, from) {
     result = result.sort((a, b) => {
         const date1 = new Date(a.start.dateTime)
         const date2 = new Date(b.start.dateTime)
-        return date1.getTime()-date2.getTime()
+        return orderBy == 'desc' ? date2.getTime()-date1.getTime() : date1.getTime()-date2.getTime()
     })
     return result
 }
 
+async function getEvent(calendarId, eventId, config={}) {
+    const result = await calendar.events.get({
+        calendarId,
+        eventId
+    })
+    return result.data
+}
 
 /**
  * Adds a participent to the event of a calendar
@@ -44,16 +54,20 @@ async function getOrderedEvents(calendarsIds, from) {
  * @param {String} eventId 
  * @param {String} email 
  */
-async function addParticipants (calendarId, eventId, email) {
+async function addParticipant (calendarId, eventId, email) {
+    // Get original attendees
+    const event = await getEvent(calendarId, eventId)
+
     const response = await calendar.events.patch({
         calendarId,
         eventId,
         sendNotifications: true, // Sends a notification to the new participent
         resource: {
             attendees: [
-              {
-                email
-              }
+                ...event.attendees,
+                {
+                    email
+                }
             ]
           }
     })
@@ -92,7 +106,7 @@ async function listCalendars () {
 module.exports = {
     listCalendars,
     getEvents,
-    addParticipants,
-    getOrderedEvents,
+    addParticipant,
+    getAllEvents,
     listPublicCalendars
 }
