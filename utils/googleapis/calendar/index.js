@@ -6,12 +6,11 @@ const publicCalendars = require('./calendars.json')
  * @param {String} id email used to diferentiate calendars
  * @param {*} from date in ISO format
  */
-async function getEvents (id, from) {
+async function getEvents (id, config) {
     const response = await calendar.events.list({
         calendarId: id,
         alwaysIncludeEmail: true,
-        maxResults: 2500,
-        timeMin: from
+        ...config
     })
     return response.data
 }

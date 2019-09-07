@@ -15,9 +15,16 @@ router.get('/', function(req, res, next) {
   })
 })
 
+// Lister les calendriers
 router.get('/calendarList/list', asyncMiddleware(async (req, res, next) => {
   res.status(200);
   res.json(await calendar.listPublicCalendars())
+}))
+
+// Lister tous les événements d'un calendrier
+router.post('/:calendarId/events', asyncMiddleware(async (req, res, next) => {
+  res.status(200);
+  res.json(await calendar.getEvents(req.params.calendarId, req.body))
 }))
 
 module.exports = router
