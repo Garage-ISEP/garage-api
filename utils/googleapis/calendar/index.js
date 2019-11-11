@@ -81,17 +81,18 @@ async function addParticipant (calendarId, eventId, email) {
 async function listPublicCalendars () {
     let result = []
     await Promise.all(publicCalendars.map(async id => {
-        const response = await calendar.calendars.get({
+        const response = await calendar.calendarList.get({
             calendarId: id
         })
 
         result.push({
             summary: response.data.summary,
+            backgroundColor: response.data.backgroundColor,
+            foregroundColor: response.data.foregroundColor,
             id: response.data.id,
             timeZone: response.data.timeZone
         })
     }));
-
     return result
 }
 
