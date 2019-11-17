@@ -33,8 +33,8 @@ async function getAllEvents(calendarsIds, config={}, orderBy='asc') {
         result = result.concat(items)
     }));
     result = result.sort((a, b) => {
-        const date1 = new Date(a.start.dateTime)
-        const date2 = new Date(b.start.dateTime)
+        const date1 = new Date(a.start.dateTime || a.start.date)
+        const date2 = new Date(b.start.dateTime || b.start.date)
         return orderBy == 'desc' ? date2.getTime()-date1.getTime() : date1.getTime()-date2.getTime()
     })
     return result
@@ -57,7 +57,22 @@ async function getEvent(calendarId, eventId, config={}) {
 async function addParticipant (calendarId, eventId, email) {
     // Get original attendees
     const event = await getEvent(calendarId, eventId)
-
+    if(!event.attendees) {
+        event.attendees = []
+    }
+    console.log({
+        calendarId,
+        eventId,
+        sendNotifications: true, // Sends a notification to the new participent
+        resource: {
+            attendees: [
+                ...event.attendees,
+                {
+                    email
+                }
+            ]
+          }
+    }.resource.attendees)
     const response = await calendar.events.patch({
         calendarId,
         eventId,
@@ -80,15 +95,16 @@ async function addParticipant (calendarId, eventId, email) {
  */
 async function listPublicCalendars () {
     let result = []
-    await Promise.all(publicCalendars.map(async id => {
+    await Promise.all(publicCalendars.map(async cal => {
         const response = await calendar.calendarList.get({
-            calendarId: id
+            calendarId: cal.id
         })
 
         result.push({
             summary: response.data.summary,
             backgroundColor: response.data.backgroundColor,
             foregroundColor: response.data.foregroundColor,
+            color: cal.color,
             id: response.data.id,
             timeZone: response.data.timeZone
         })

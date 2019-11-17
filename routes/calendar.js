@@ -25,7 +25,7 @@ router.get('/calendarList/list', asyncMiddleware(async (req, res, next) => {
 // Lister tous les événements
 router.post('/all/events', asyncMiddleware(async (req, res, next) => {
   res.status(200)
-  res.json(await calendar.getAllEvents(calendars, req.body))
+  res.json(await calendar.getAllEvents(calendars.map(calendar => calendar.id), req.body))
 }))
 
 // Lister tous les événements d'un calendrier
@@ -36,8 +36,15 @@ router.post('/:calendarId/events', asyncMiddleware(async (req, res, next) => {
 
 // Ajouter un participant à un événement
 router.post('/:calendarId/events/:eventId/addParticipant', asyncMiddleware(async (req, res, next) => {
-  res.status(200)
-  res.json(await calendar.addParticipant(req.params.calendarId, req.params.eventId, req.body.email))
+  try {
+    response = await calendar.addParticipant(req.params.calendarId, req.params.eventId, req.body.email)
+    res.status(200)
+    res.json(response)
+  } catch (e) {
+    console.log(e)
+    res.status(500)
+    res.json({message: e.message})
+  }
 }))
 
 module.exports = router
