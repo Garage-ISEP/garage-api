@@ -1,5 +1,5 @@
 const { google } = require('googleapis')
-let privatekey = require('./privatekey.json.js')
+let privatekey = require('./privatekey.json')
 
 // configure a JWT auth client
 let jwtClient = new google.auth.JWT(
