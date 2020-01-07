@@ -123,6 +123,7 @@ async function listCalendars () {
 module.exports = {
     listCalendars,
     getEvents,
+    getEvent,
     addParticipant,
     getAllEvents,
     listPublicCalendars
