@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  api:
+    ports: 
+      - "3000:3000"
+    command: npm run dev
+    environment: 
+      - PORT=3000
+      - NODE_ENV=development
