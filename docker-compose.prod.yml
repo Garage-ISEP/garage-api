@@ -9,3 +9,19 @@ services:
     environment: 
       - PORT=80
       - NODE_ENV=production
+    networks: 
+      - "traefik"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web-secure.rule=Host(`api.garageisep.com`)"
+      - "traefik.http.routers.web-secure.entrypoints=websecure"
+      - "traefik.http.routers.web-secure.tls.certresolver=myhttpchallenge"
+      # https redirection
+      - "traefik.http.middlewares.redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.web.rule=Host(`api.garageisep.com`)"
+      - "traefik.http.routers.web.entrypoints=web"
+      - "traefik.http.routers.web.middlewares=redirect"
+
+networks:
+  traefik:
+    external: true
