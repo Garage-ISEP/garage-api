@@ -2,10 +2,10 @@ version: '3'
 
 services:
   api:
-    ports: 
-      - "80:80"
     command: npm start
     restart: always
+    expose:
+      - 80
     environment: 
       - PORT=80
       - NODE_ENV=production
@@ -13,14 +13,14 @@ services:
       - "traefik"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web-secure.rule=Host(`api.garageisep.com`)"
-      - "traefik.http.routers.web-secure.entrypoints=websecure"
-      - "traefik.http.routers.web-secure.tls.certresolver=myhttpchallenge"
+      - "traefik.http.routers.garage-api-secure.rule=Host(`api.garageisep.com`)"
+      - "traefik.http.routers.garage-api-secure.entrypoints=websecure"
+      - "traefik.http.routers.garage-api-secure.tls.certresolver=myhttpchallenge"
       # https redirection
       - "traefik.http.middlewares.redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.web.rule=Host(`api.garageisep.com`)"
-      - "traefik.http.routers.web.entrypoints=web"
-      - "traefik.http.routers.web.middlewares=redirect"
+      - "traefik.http.routers.garage-api.rule=Host(`api.garageisep.com`)"
+      - "traefik.http.routers.garage-api.entrypoints=web"
+      - "traefik.http.routers.garage-api.middlewares=redirect"
 
 networks:
   traefik:
