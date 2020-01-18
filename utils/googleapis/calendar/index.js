@@ -96,18 +96,20 @@ async function addParticipant (calendarId, eventId, email) {
 async function listPublicCalendars () {
     let result = []
     await Promise.all(publicCalendars.map(async cal => {
-        const response = await calendar.calendarList.get({
-            calendarId: cal.id
-        })
+        try {
+            const response = await calendar.calendars.get({
+                calendarId: cal.id
+            })
 
-        result.push({
-            summary: response.data.summary,
-            backgroundColor: response.data.backgroundColor,
-            foregroundColor: response.data.foregroundColor,
-            color: cal.color,
-            id: response.data.id,
-            timeZone: response.data.timeZone
-        })
+            result.push({
+                summary: response.data.summary,
+                color: cal.color,
+                id: response.data.id,
+                timeZone: response.data.timeZone
+            })
+        } catch (e) {
+            console.error(`Calendar ${cal.id} was not found`);
+        }
     }));
     return result
 }
