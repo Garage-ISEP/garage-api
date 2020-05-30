@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+require("dotenv").config();
 
 var indexRouter = require('./routes/index');
 var calendarRouter = require('./routes/calendar');
