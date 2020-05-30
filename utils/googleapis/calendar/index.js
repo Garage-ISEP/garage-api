@@ -21,7 +21,8 @@ async function getEvents (id, config) {
  * List all events of a calendar
  * @param {*} calendarsIds list of all the emails used to diferentiate calendars
  * @param {*} orderBy order by default asc
- * @param {*} config see googleapi
+ * @param {Object} config see googleapi
+ * @param {int} config.maxEvents Max number of events returned
  */
 async function getAllEvents(calendarsIds, config={}, orderBy='asc') {
     let result = []
@@ -37,7 +38,7 @@ async function getAllEvents(calendarsIds, config={}, orderBy='asc') {
         const date2 = new Date(b.start.dateTime || b.start.date)
         return orderBy == 'desc' ? date2.getTime()-date1.getTime() : date1.getTime()-date2.getTime()
     })
-    return result
+    return result.slice(0, config.maxEvents || 10);
 }
 
 async function getEvent(calendarId, eventId, config={}) {
