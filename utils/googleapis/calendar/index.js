@@ -21,10 +21,10 @@ async function getEvents (id, config) {
  * List all events of a calendar
  * @param {*} calendarsIds list of all the emails used to diferentiate calendars
  * @param {*} orderBy order by default asc
- * @param {Object} config see googleapi
- * @param {int} config.maxEvents Max number of events returned
+ * @param {*} config see googleapi
  */
 async function getAllEvents(calendarsIds, config={}, orderBy='asc') {
+    config = {maxResults: 250, ...config};
     let result = []
     await Promise.all(calendarsIds.map(async id => {
         const response = await getEvents(id, config)
@@ -38,7 +38,7 @@ async function getAllEvents(calendarsIds, config={}, orderBy='asc') {
         const date2 = new Date(b.start.dateTime || b.start.date)
         return orderBy == 'desc' ? date2.getTime()-date1.getTime() : date1.getTime()-date2.getTime()
     })
-    return result.slice(0, config.maxEvents || 10);
+    return result.slice(0, config.maxResults);
 }
 
 async function getEvent(calendarId, eventId, config={}) {

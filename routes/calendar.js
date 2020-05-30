@@ -25,7 +25,7 @@ router.get('/calendarList/list', asyncMiddleware(async (req, res, next) => {
 // Lister tous les événements
 router.post('/all/events', asyncMiddleware(async (req, res, next) => {
   res.status(200)
-  res.json(await calendar.getAllEvents(calendars.map(calendar => calendar.id), {...req.body, maxEvents: 10}));  //TODO: maxEvents à modifier dynamiquement
+  res.json(await calendar.getAllEvents(calendars.map(calendar => calendar.id), req.body));
 }))
 
 // Lister tous les événements d'un calendrier
