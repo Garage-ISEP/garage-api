@@ -1,4 +1,4 @@
-const { google } = require('googleapis')
+import { google } from "googleapis";
 
 // configure a JWT auth client
 let jwtClient = new google.auth.JWT(
@@ -18,13 +18,10 @@ jwtClient.authorize(function (err, tokens) {
   }
 })
 
-// Google Calendar API
 const calendar = google.calendar({
-  version: 'v3',
-  auth: jwtClient
+	version: 'v3',
+	auth: jwtClient
 })
 
-// Export all
-module.exports = {
-  calendar
-}
+// Google Calendar API
+export { calendar };

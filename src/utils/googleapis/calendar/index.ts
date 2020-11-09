@@ -1,15 +1,15 @@
-const { calendar } = require('../googleapis')
-const publicCalendars = require('./calendars.json')
+import { calendar_v3 } from 'googleapis';
+import { MethodOptions } from 'googleapis/build/src/apis/ml';
+import { calendar } from '../googleapis';
+import * as publicCalendars from './calendars.json';
 
 /**
  * List all events of a calendar
- * @param {String} id email used to diferentiate calendars
- * @param {Object} config see google api
  */
-async function getEvents (id, config) {
+async function getEvents(id: string, config: MethodOptions): Promise<calendar_v3.Schema$Events> {
     const response = await calendar.events.list({
         calendarId: id,
-        alwaysIncludeEmail: true,
+		alwaysIncludeEmail: true,
         ...config
     })
     return response.data
@@ -23,7 +23,7 @@ async function getEvents (id, config) {
  * @param {*} orderBy order by default asc
  * @param {*} config see googleapi
  */
-async function getAllEvents(calendarsIds, config={}, orderBy='asc') {
+async function getAllEvents(calendarsIds: string[], config: MethodOptions, orderBy: "desc"|"asc" = 'asc') {
     let result = []
     await Promise.all(calendarsIds.map(async id => {
         const response = await getEvents(id, config)
