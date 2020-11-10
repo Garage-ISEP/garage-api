@@ -5,7 +5,6 @@ import * as bodyParser from "body-parser";
 import * as cors from "cors";
 import * as dotenv from "dotenv";
 
-import indexRouter from './routes/IndexRoute';
 import Logger from "./utils/Logger";
 import RouteManager from "./routes/RouteManager";
 
@@ -25,7 +24,7 @@ class App {
 		this.app.use(bodyParser.json());
 		this.app.use(cors());
 		  
-		await this._routeManager.init();
+		this._routeManager.init();
 		this.app.use("/", this._routeManager.router);
 
 		this.app.listen(process.env.PORT ?? 3000, () => this._onListening());
