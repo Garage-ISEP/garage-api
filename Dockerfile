@@ -6,7 +6,10 @@ WORKDIR /usr/src/app
 
 # Install dependencies
 COPY package.json .
+
 RUN npm install --quiet
+RUN npm install -g typescript --quiet
+RUN tsc
 
 # Bundle app source
 COPY . .
