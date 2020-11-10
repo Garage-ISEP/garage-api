@@ -4,15 +4,11 @@ FROM node:10-alpine
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-# Install dependencies
-COPY package.json .
-COPY tsconfig.json .
+COPY . .
 
 RUN npm install --quiet
 RUN npm install -g typescript --quiet
-RUN tsc
 
-# Bundle app source
-COPY . .
+RUN tsc
 
 CMD npm start
