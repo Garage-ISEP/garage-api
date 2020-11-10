@@ -61,7 +61,7 @@ class RouteManager {
 			"/calendar/all/events": {
 				route: CalendarAllEventsRoute,
 				type: "POST",
-				verifyParams: true,
+				verifyParams: false,
 			},
 			"/calendar/:calendarId/events": {
 				route: CalendarEventsRoute,
