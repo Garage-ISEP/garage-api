@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 
 # Install dependencies
 COPY package.json .
+COPY tsconfig.json .
 
 RUN npm install --quiet
 RUN npm install -g typescript --quiet
