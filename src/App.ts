@@ -35,3 +35,5 @@ class App {
 		this._logger.log("Listening on port", process.env.PORT ?? 3000);
 	}
 }
+
+export default new App();

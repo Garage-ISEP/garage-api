@@ -1,32 +1,41 @@
 import { Response, Request } from 'express';
 import Route from '../Route';
+import * as jsonPackage from "../../../package.json";
 
-class HTTPRequest<JSONBody> {
-	public jsonBody: JSONBody;
+class HTTPRequest<Body> {
+	public body: Body;
 
 	constructor(
 		public request: Request,
 		private _response: Response,
-		protected _route: Route
+		protected _route: Route<Body>,
+		private _checkParams: boolean = true
 	) {
-		this.jsonBody = { ...this.request.body, ...this.request.query, ...this.request.params };
+		this.body = { ...this.request.body, ...this.request.query, ...this.request.params };
 	}
 
 	public handleRequest() {
-		this._route.logger.log("Params", this.jsonBody);
+		this._route.logger.log("Params", this.body);
+		//Checking expected parameters
+		if (this._checkParams) {
+			const res = this.checkBody(this._route.expectedData);
+			if (!res.success) {
+				this.sendJson400Error(res.payload);
+				return;
+			}
+		}
 		this._route.handle(this);
 	}
 
 	/**
 	 * Vérifie que le corp de la requête est bien constitué de tous les paramètres demandés
 	 * Renvoie un object avec les clef de la requete et true si le paramêtre est spécifié ou false si il ne l'est pas
-	 * @param expectedData 
 	 */
-	public checkJSONBody(expectedData: (keyof JSONBody)[]): { success: boolean, payload: { [Key in keyof JSONBody]: boolean } } {
-		const response: { [Key in keyof JSONBody]: boolean } = {} as { [Key in keyof JSONBody]: boolean };
+	public checkBody(expectedData: (keyof Body)[]): { success: boolean, payload: { [Key in keyof Body]: boolean } } {
+		const response: { [Key in keyof Body]: boolean } = {} as { [Key in keyof Body]: boolean };
 		let success: boolean = true;
 		for (const expectedKey of expectedData) {
-			if (this.jsonBody[expectedKey] == undefined) {
+			if (this.body[expectedKey] == undefined) {
 				response[expectedKey] = false;
 				success = false;
 			} else
@@ -39,8 +48,20 @@ class HTTPRequest<JSONBody> {
 		this._response.json({ code: code, payload: payload })
 	}
 
-	public sendJsonError(message: string, code: number, payload?: { [Key in keyof Partial<JSONBody>]: boolean }) {
+	public sendJson400Error(payload: { [Key in keyof Partial<Body>]: boolean }) {
+		this.sendJsonError("Missing Request Params", 400, payload);
+	}
+
+	public sendJsonError<JSONResponse>(message: string = "Internal Server Error", code: number = 500, payload?: JSONResponse ) {
 		this._response.status(code).json({ code: code, message: message, payload: payload });
+	}
+
+	public sendJsonVersion(msg: string) {
+		this.sendJsonPayload({
+			status: 200,
+			version: jsonPackage.version,
+			msg: msg
+		});
 	}
 }
 

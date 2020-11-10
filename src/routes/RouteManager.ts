@@ -1,27 +1,37 @@
 import { Router } from "express";
 import Logger from "../utils/Logger";
 import HTTPRequest from "./http/HTTPRequest";
-import IndexRoute from "./IndexRoute";
 import Route from "./Route";
+import Calendar from "../api/calendar/";
+import IndexRoute from "./IndexRoute";
+
+import CalendarIndexRoute from "./calendar/CalendarIndexRoute";
+import CalendarListRoute from "./calendar/calendarList/CalendarListRoute";
+import CalendarEventsRoute from "./calendar/calendarEvents/CalendarEventsRoute";
+import CalendarAllEventsRoute from "./calendar/calendarAllEvents/CalendarAllEventsRoute";
+import CalendarAddParticipantRoute from "./calendar/calendarAddParticipant/CalendarAddParticipantRoute";
 
 class RouteManager {
 	public router: Router = Router();
 
 	private readonly _logger = new Logger(this);
-
+	private _calendarAPI: Calendar;
+	
 	private _routes: {
 		[key: string]: {
-			route: (typeof Route | typeof IndexRoute),
-			type: "POST"|"GET"
+			route: typeof Route | typeof IndexRoute,
+			type: "POST"|"GET",
+			verifyParams?: boolean
 		}
 	}
 
-	public init() {
+	public async init() {
 		this._setRoutes();
+		this._calendarAPI = await new Calendar().init();
 
 		for (const routeKey in this._routes) {
 			const routeParams = this._routes[routeKey];
-			const route = new routeParams.route()
+			const route = new routeParams.route(this._calendarAPI)
 
 			this._logger.log(routeParams.type, routeKey);
 			
@@ -36,11 +46,33 @@ class RouteManager {
 		this._routes = {
 			"/": {
 				route: IndexRoute,
-				type: "GET"
+				type: "GET",
+				verifyParams: false,
 			},
 			"/calendar": {
-				route: RouteCalendar,
-				type: "GET"
+				route: CalendarIndexRoute,
+				type: "GET",
+				verifyParams: false,
+			},
+			"/calendar/all": {
+				route: CalendarListRoute,
+				type: "GET",
+				verifyParams: false
+			},
+			"/calendar/all/events": {
+				route: CalendarAllEventsRoute,
+				type: "POST",
+				verifyParams: true,
+			},
+			"/calendar/:calendarId/events": {
+				route: CalendarEventsRoute,
+				type: "POST",
+				verifyParams: true
+			},
+			"/calendar/:calendarId/events/:eventId/addParticipant": {
+				route: CalendarAddParticipantRoute,
+				type: "POST",
+				verifyParams: true
 			}
 		}
 	}

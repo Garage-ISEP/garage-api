@@ -2,12 +2,13 @@ import Logger from "../../utils/Logger";
 import { calendar_v3 } from 'googleapis';
 import { google } from "googleapis";
 import * as publicCalendars from './calendars.json';
+import PublicCalendarModel from "./PublicCalendarModel";
 
 class Calendar {
 	private readonly _logger: Logger = new Logger(this);
 	private _calendar: calendar_v3.Calendar;
 
-	public async init(): Promise<void> {
+	public async init(): Promise<Calendar> {
 		// configure a JWT auth client
 		let jwtClient = new google.auth.JWT({
 			email: process.env.client_email,
@@ -35,6 +36,8 @@ class Calendar {
 			version: 'v3',
 			auth: jwtClient
 		});
+
+		return this;
 	}
 
 	/**
@@ -54,15 +57,15 @@ class Calendar {
 	/**
 	 * List all events of a calendar
 	 */
-	public async getAllEvents(calendarsIds: string[], config?: calendar_v3.Params$Resource$Events$Get, orderBy: "desc" | "asc" = 'asc'): Promise<calendar_v3.Schema$Event[]> {
+	public async getAllEvents(config?: calendar_v3.Params$Resource$Events$Get, orderBy: "desc" | "asc" = 'asc'): Promise<calendar_v3.Schema$Event[]> {
 		let result: calendar_v3.Schema$Event[] = [];
 
-		await Promise.all(calendarsIds.map(async id => {
-			const response = await this.getEvents(id, config)
+		await Promise.all(publicCalendars.map(async el => {
+			const response = await this.getEvents(el.id, config)
 			const items = response.items.map(event => {
-				return Object.assign({ calendarId: id }, event)
+				return Object.assign({ calendarId: el.id }, event)
 			})
-			result = result.concat(items)
+			result = result.concat(items);
 		}));
 		result = result.sort((a, b) => {
 			const date1 = new Date(a.start.dateTime || a.start.date)
@@ -84,7 +87,7 @@ class Calendar {
 	/**
 	 * Adds a participent to the event of a calendar
 	 */
-	public async addParticipant(calendarId: string, eventId: string, email: string) {
+	public async addParticipant(calendarId: string, eventId: string, email: string): Promise<calendar_v3.Schema$Event> {
 		// Get original attendees
 		const event = await this.getEvent(calendarId, eventId);
 
@@ -108,8 +111,8 @@ class Calendar {
 	/**
 	 * List all public calendars
 	 */
-	public async listPublicCalendars() {
-		let result = []
+	public async listPublicCalendars(): Promise<PublicCalendarModel[]> {
+		let result: PublicCalendarModel[] = []
 		await Promise.all(publicCalendars.map(async cal => {
 			try {
 				const response = await this._calendar.calendars.get({
