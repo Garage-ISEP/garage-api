@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import Route from '../Route';
-import * as jsonPackage from "../../../package.json";
+const jsonPackage = require("../../../package.json");
 
 class HTTPRequest<Body> {
 	public body: Body;
@@ -9,15 +9,15 @@ class HTTPRequest<Body> {
 		public request: Request,
 		private _response: Response,
 		protected _route: Route<Body>,
-		private _checkParams: boolean = true
+		private _checkParams: boolean
 	) {
 		this.body = { ...this.request.body, ...this.request.query, ...this.request.params };
 	}
 
 	public handleRequest() {
-		this._route.logger.log("Params", this.body);
 		//Checking expected parameters
 		if (this._checkParams) {
+			this._route.logger.log("Params", this.body);
 			const res = this.checkBody(this._route.expectedData);
 			if (!res.success) {
 				this.sendJson400Error(res.payload);

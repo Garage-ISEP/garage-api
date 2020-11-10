@@ -6,7 +6,7 @@ abstract class Route<Body> {
 	public logger: Logger = new Logger(this);
 
 	public abstract expectedData: (keyof Body)[];
-
+	
 	constructor(
 		protected _calendarAPI: Calendar
 	) {	}

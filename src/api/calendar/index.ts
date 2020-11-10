@@ -9,6 +9,8 @@ class Calendar {
 	private _calendar: calendar_v3.Calendar;
 
 	public async init(): Promise<Calendar> {
+		this._logger.log("Calendar Initilization...");
+
 		// configure a JWT auth client
 		let jwtClient = new google.auth.JWT({
 			email: process.env.client_email,

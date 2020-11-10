@@ -1,11 +1,14 @@
-import * as npmPackage from '../../package.json';
+const npmPackage = require('../../package.json');
 import Route from './Route';
 import HTTPRequest from "./http/HTTPRequest";
+import Calendar from 'src/api/calendar';
 
 /**
  * Route: /
  */
-class IndexRoute extends Route {
+class IndexRoute extends Route<void> {
+
+	public expectedData: never;
 
 	public handle(request: HTTPRequest<void>) {
 		request.sendJsonPayload({

@@ -23,9 +23,9 @@ class App {
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
 		this.app.use(cors());
-		  
-		this._routeManager.init();
-		this.app.use("/", this._routeManager.router);
+	
+		await this._routeManager.init();
+		this.app.use(this._routeManager.router);
 
 		this.app.listen(process.env.PORT ?? 3000, () => this._onListening());
 	}
@@ -36,4 +36,4 @@ class App {
 	}
 }
 
-export default new App();
+export default new App().init();

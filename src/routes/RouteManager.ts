@@ -1,10 +1,9 @@
 import { Router } from "express";
 import Logger from "../utils/Logger";
 import HTTPRequest from "./http/HTTPRequest";
-import Route from "./Route";
 import Calendar from "../api/calendar/";
-import IndexRoute from "./IndexRoute";
 
+import IndexRoute from "./IndexRoute";
 import CalendarIndexRoute from "./calendar/CalendarIndexRoute";
 import CalendarListRoute from "./calendar/calendarList/CalendarListRoute";
 import CalendarEventsRoute from "./calendar/calendarEvents/CalendarEventsRoute";
@@ -19,9 +18,9 @@ class RouteManager {
 	
 	private _routes: {
 		[key: string]: {
-			route: typeof Route | typeof IndexRoute,
+			route: any,	//Typeof Route but error because of type parameter
 			type: "POST"|"GET",
-			verifyParams?: boolean
+			verifyParams: boolean
 		}
 	}
 
@@ -36,9 +35,9 @@ class RouteManager {
 			this._logger.log(routeParams.type, routeKey);
 			
 			if (routeParams.type == "GET")
-				this.router.get(routeKey, (req, res) => new HTTPRequest(req, res, route).handleRequest())
+				this.router.get(routeKey, (req, res) => new HTTPRequest(req, res, route, routeParams.verifyParams).handleRequest())
 			else if (routeParams.type = "POST")
-				this.router.post(routeKey, (req, res) => new HTTPRequest(req, res, route).handleRequest())
+				this.router.post(routeKey, (req, res) => new HTTPRequest(req, res, route, routeParams.verifyParams).handleRequest())
 		}
 	}
 
