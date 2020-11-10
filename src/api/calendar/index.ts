@@ -14,7 +14,7 @@ class Calendar {
 		// configure a JWT auth client
 		let jwtClient = new google.auth.JWT({
 			email: process.env.client_email,
-			key: process.env.private_key,
+			key: process.env.private_key.replace(/\\n/g, '\n'),
 			scopes: [
 				'https://www.googleapis.com/auth/spreadsheets',
 				'https://www.googleapis.com/auth/drive',
