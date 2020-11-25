@@ -29,7 +29,7 @@ class Calendar {
 					this._logger.error(err)
 				else
 					this._logger.log("Calendar API Connected");
-				resolve();
+				resolve(this);
 			});
 		});
 		
